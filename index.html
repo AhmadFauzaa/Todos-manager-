@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>To-Do List - Mode Theme</title>
+  <link rel="icon" href="todo-icon.png" type="image/png">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #000000;
+      --header: #ff6b6b;
+      --input: #ffeaa7;
+      --button: #00b894;
+    }
+
+    [data-theme="dark"] {
+      --bg: #121212;
+      --text: #ffffff;
+      --header: #2c2c2c;
+      --input: #2d3436;
+      --button: #0984e3;
+    }
+
+    * {
+      box-sizing: border-box;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      min-height: 100%;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 360px; /* Maksimal lebar seperti layar ponsel */
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      overflow: hidden;
+      border: 1px solid #ccc;
+    }
+
+    .header {
+      background-color: var(--header);
+      text-align: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .header h1 {
+      margin: 0;
+      color: #fff;
+      font-size: 20px;
+    }
+
+    .theme-switcher {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+
+    .theme-switcher select {
+      padding: 5px;
+      border-radius: 5px;
+      font-size: 14px;
+      border: none;
+    }
+
+    .input-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding: 0 15px;
+    }
+
+    .header input {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background: var(--input);
+    }
+
+    .add-btn {
+      background-color: var(--button);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background 0.3s;
+    }
+
+    .add-btn:hover {
+      filter: brightness(1.2);
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ccc;
+      transition: all 0.3s ease;
+    }
+
+    li.fade-out {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+
+    .completed {
+      text-decoration: line-through;
+      color: gray;
+    }
+
+    .instructions {
+      background-color: var(--header);
+      padding: 20px;
+      color: white;
+    }
+
+    .instructions h2 {
+      text-align: center;
+    }
+
+    .instructions .step {
+      background: #f1f1f1;
+      color: #000;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    [data-theme="dark"] .instructions .step {
+      background: #2d3436;
+      color: #fff;
+    }
+
+    button.task-btn {
+      background: none;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    button.task-btn:hover {
+      transform: scale(1.2);
+    }
+
+    /* Media Queries for mobile responsiveness */
+    @media (max-width: 600px) {
+      .container {
+        width: 100%;
+        padding: 10px;
+      }
+
+      .header h1 {
+        font-size: 18px;
+      }
+
+      .input-group {
+        flex-direction: column;
+      }
+
+      .header input {
+        margin-bottom: 10px;
+      }
+
+      .add-btn {
+        width: 100%;
+        font-size: 20px;
+      }
+
+      .instructions .step {
+        font-size: 12px;
+      }
+
+      button.task-btn {
+        font-size: 14px;
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body data-theme="auto">
+  <div class="container">
+    <div class="header">
+      <h1>TO-DO LIST</h1>
+      <div class="theme-switcher">
+        <select id="themeSelect" onchange="changeTheme(this.value)">
+          <option value="auto">Default</option>
+          <option value="light">Terang</option>
+          <option value="dark">Gelap</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <input id="taskInput" type="text" placeholder="Tambahkan tugas..." />
+        <button class="add-btn" onclick="addTask()">➕</button>
+      </div>
+    </div>
+    <ul id="taskList"></ul>
+
+    <div class="instructions">
+      <h2>CARA PAKAI</h2>
+      <div class="step"><b>TAMBAH TUGAS</b><br>Ketik di kotak, tekan Enter atau tombol ➕.</div>
+      <div class="step"><b>SELESAIKAN TUGAS</b><br>Klik ☐ untuk tandai selesai.</div>
+      <div class="step"><b>EDIT TUGAS</b><br>Klik ✏️ untuk edit (popup).</div>
+      <div class="step"><b>HAPUS TUGAS</b><br>Klik 🗑️ untuk hapus (dengan popup animasi).</div>
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById("taskInput");
+    const taskList = document.getElementById("taskList");
+
+    // Theme switcher
+    function changeTheme(mode) {
+      document.body.setAttribute("data-theme", mode);
+      localStorage.setItem("theme-mode", mode);
+    }
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem("theme-mode") || "auto";
+    document.getElementById("themeSelect").value = savedTheme;
+    changeTheme(savedTheme);
+
+    input.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") addTask();
+    });
+
+    function addTask() {
+      const taskText = input.value.trim();
+      if (taskText === "") {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Oops...',
+          text: 'Bidang tugas tidak boleh kosong!',
+          confirmButtonColor: '#ff6b6b'
+        });
+        return;
+      }
+
+      const li = document.createElement("li");
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.addEventListener("click", () => {
+        span.classList.toggle("completed");
+      });
+
+      const span = document.createElement("span");
+      span.textContent = taskText;
+
+      const editBtn = document.createElement("button");
+      editBtn.textContent = "✏️";
+      editBtn.className = "task-btn";
+      editBtn.onclick = () => {
+        Swal.fire({
+          title: 'Edit Tugas',
+          input: 'text',
+          inputValue: span.textContent,
+          showCancelButton: true,
+          confirmButtonText: 'Simpan'
+        }).then((result) => {
+          if (result.isConfirmed && result.value.trim()) {
+            span.textContent = result.value.trim();
+            Swal.fire('Tersimpan!', '', 'success');
+          }
+        });
+      };
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "🗑️";
+      deleteBtn.className = "task-btn";
+      deleteBtn.onclick = () => {
+        Swal.fire({
+          title: 'Hapus tugas ini?',
+          text: "Tugas akan dihapus permanen.",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Ya, hapus!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            li.classList.add("fade-out");
+            setTimeout(() => taskList.removeChild(li), 300);
+            Swal.fire('Terhapus!', 'Tugas berhasil dihapus.', 'success');
+          }
+        });
+      };
+
+      li.appendChild(checkbox);
+      li.appendChild(span);
+      li.appendChild(editBtn);
+      li.appendChild(deleteBtn);
+      taskList.appendChild(li);
+
+      input.value = "";
+    }
+  </script>
+</body>
+</html>
